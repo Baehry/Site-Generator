@@ -27,7 +27,7 @@ class LeafNode(HTMLNode):
     def to_html(self):
         if self.value == None or self.value == "":
             raise ValueError()
-        if self.tag == None:
+        if self.tag == None or self.tag == "":
             return value
         return "<" + self.tag + self.props_to_html() + ">" + self.value + "</" + self.tag + ">"
 
@@ -37,7 +37,7 @@ class ParentNode(HTMLNode):
         super().__init__(tag, None, children, props)
     
     def to_html(self):
-        if self.tag == None:
+        if self.tag == None or self.tag == "":
             raise ValueError()
         if self.children == None:
             raise ValueError()

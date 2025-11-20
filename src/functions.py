@@ -23,15 +23,15 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         if node.text_type != TextType.TEXT:
             result.append(node)
             continue
-        strings = node.text.split(delimeter)
+        strings = node.text.split(delimiter)
         sub = False
         for string in strings:
             if sub:
-                result.append(string, text_type)
-                sub = True
-            else:
-                result.append(string, node.text_type)
+                result.append(TextNode(string, text_type))
                 sub = False
+            else:
+                result.append(TextNode(string, node.text_type))
+                sub = True
         if not sub:
             raise Exception("closing delimeter missing")
     return result
@@ -78,5 +78,12 @@ def split_nodes_link(old_nodes):
             result.append(TextNode(text, TextType.TEXT))
     return result
 
-
+def text_to_textnodes(text):
+    original_nodes = [TextNode(text, TextType.TEXT)]
+    with_bold = split_nodes_delimiter(original_nodes, "**", TextType.BOLD)
+    with_italic = split_nodes_delimiter(with_bold, "_", TextType.ITALIC)
+    with_code = split_nodes_delimiter(with_italic, "`", TextType.CODE)
+    with_images = split_nodes_image(with_code)
+    with_links = split_nodes_link(with_images)
+    return with_links
 

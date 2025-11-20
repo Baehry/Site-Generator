@@ -1,5 +1,6 @@
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode, ParentNode
+import re
 
 def text_node_to_html_node(text_node):
     match text_node.text_type:
@@ -34,3 +35,48 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         if not sub:
             raise Exception("closing delimeter missing")
     return result
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+def extract_markdown_links(text):
+    return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+def split_nodes_image(old_nodes):
+    result = []
+    for node in old_nodes:
+        images = extract_markdown_images(node.text)
+        if images == [] or node.text_type != TextType.TEXT:
+            result.append(node)
+            continue
+        text = node.text
+        for image in images:
+            split_text = text.split(f"![{image[0]}]({image[1]})", 1)
+            if split_text[0] != "":
+                result.append(TextNode(split_text[0], TextType.TEXT))
+            result.append(TextNode(image[0], TextType.IMAGE, image[1]))
+            text = split_text[1]
+        if text != "":
+            result.append(TextNode(text, TextType.TEXT))
+    return result
+
+def split_nodes_link(old_nodes):
+    result = []
+    for node in old_nodes:
+        links = extract_markdown_links(node.text)
+        if links == [] or node.text_type != TextType.TEXT:
+            result.append(node)
+            continue
+        text = node.text
+        for link in links:
+            split_text = text.split(f"[{link[0]}]({link[1]})", 1)
+            if split_text[0] != "":
+                result.append(TextNode(split_text[0], TextType.TEXT))
+            result.append(TextNode(link[0], TextType.LINK, link[1]))
+            text = split_text[1]
+        if text != "":
+            result.append(TextNode(text, TextType.TEXT))
+    return result
+
+
+

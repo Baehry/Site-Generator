@@ -1,5 +1,5 @@
-from textnode import TextNode, TextType
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from nodes import TextNode, HTMLNode, LeafNode, ParentNode
+from enums import TextType, BlockType
 import re
 
 def text_node_to_html_node(text_node):
@@ -93,3 +93,41 @@ def markdown_to_blocks(markdown):
     for string in split_string:
         result.append(string.strip())
     return result
+
+def block_to_block_type(block):
+    if block.startswith("# ") or block.startswith("## ") or block.startswith("### ") or block.startswith("#### ") or block.startswith("##### ") or block.startswith("###### "):
+        return BlockType.HEADING
+    if block.startswith("```") and block.endswith("```"):
+        return BlockType.CODE
+    result = BlockType.PARAGRAPH
+    if block.startswith(">"):
+        result = BlockType.QUOTE
+    if block.startswith("- "):
+        result = BlockType.UNORDERED_LIST
+    if block.startswith("1. "):
+        result = BlockType.ORDERED_LIST
+    i = 1
+    for line in block.split("\n"):
+        if result == BlockType.PARAGRAPH:
+            break
+        if result == BlockType.QUOTE:
+            if line.startswith(">"):
+                continue
+            else:
+                result = BlockType.PARAGRAPH
+                break
+        if result == BlockType.UNORDERED_LIST:
+            if line.startswith("- "):
+                continue
+            else:
+                result = BlockType.PARAGRAPH
+                break
+        if result == BlockType.ORDERED_LIST:
+            if line.startswith(f"{i}. "):
+                i += 1
+                continue
+            else:
+                result = BlockType.PARAGRAPH
+                break
+    return result
+

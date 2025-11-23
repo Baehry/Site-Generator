@@ -43,7 +43,7 @@ class LeafNode(HTMLNode):
         if self.value == None or self.value == "":
             raise ValueError()
         if self.tag == None or self.tag == "":
-            return value
+            return self.value
         return "<" + self.tag + self.props_to_html() + ">" + self.value + "</" + self.tag + ">"
 
 

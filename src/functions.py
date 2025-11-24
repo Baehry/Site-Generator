@@ -12,9 +12,9 @@ def text_node_to_html_node(text_node):
             return LeafNode("i", text_node.text)
         case TextType.CODE:
             return LeafNode("code", text_node.text)
-        case TextNode.LINK:
+        case TextType.LINK:
             return LeafNode("a", text_node.text, {"href": text_node.url})
-        case TextNode.IMAGE:
+        case TextType.IMAGE:
             return LeafNode("img", text_node.text, {"src": text_node.url, "alt": text_node.text})
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -169,3 +169,9 @@ def text_to_parent_node(tag, text):
     for node in text_nodes:
         nodes.append(text_node_to_html_node(node))
     return ParentNode(tag, nodes)
+
+def extract_title(markdown):
+    for line in markdown.split("\n"):
+        if line.startswith("# "):
+            return line[2:]
+    raise Exception("No Title Found")

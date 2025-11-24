@@ -27,8 +27,8 @@ class HTMLNode:
         result = ""
         if self.props == None:
             return ""
-        for prop in props:
-            result += " " + prop + "=\"" + props[prop] + "\""
+        for prop in self.props:
+            result += " " + prop + "=\"" + self.props[prop] + "\""
         return result
     
     def __repr__(self):

@@ -4,7 +4,7 @@ import shutil
 
 def main():
     copy_files(os.getcwd(), "static", "public")
-    generate_page(os.path.join(os.getcwd(), "content/index.md"), os.path.join(os.getcwd(), "template.html"), os.path.join(os.getcwd(), "public/index.html"))
+    generate_pages_recursive(os.path.join(os.getcwd(), "content"), os.path.join(os.getcwd(), "template.html"), os.path.join(os.getcwd(), "public"))
 
 def copy_files(working_directory, source_directory, destination_directory):
     source_path = os.path.join(working_directory, source_directory)
@@ -35,6 +35,12 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, "w") as f:
         f.write(page)
     
-    
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    files = os.listdir(dir_path_content)
+    for file in files:
+        if os.path.isfile(os.path.join(dir_path_content, file)):
+            generate_page(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, f"{file.split(".")[0]}.html"))
+        else:
+            generate_pages_recursive(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, file))
 
 main()
